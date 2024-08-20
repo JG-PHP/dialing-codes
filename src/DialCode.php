@@ -251,20 +251,18 @@ enum DialCode: string
 
     public static function list(): array
     {
+        $cases = self::cases();
         $result = [];
-
-        foreach (self::cases() as $item) {
-            $result[$item->name] = $item->getValue();
-        }
-
+        foreach ($cases as $item) { $result[$item->name] = $item->getValue(); }
         return $result;
     }
 
     public static function listPlus(): array
     {
-        return array_map(function ($item) {
-            return '+' . ltrim($item, '0');
-        }, self::list());
+        $cases = self::cases();
+        $result = [];
+        foreach ($cases as $item) { $result[] = '+' . ltrim($item->getValue(), '0'); }
+        return $result;
     }
 
 }
