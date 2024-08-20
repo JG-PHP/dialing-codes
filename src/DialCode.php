@@ -235,6 +235,9 @@ readonly final class DialCode
 	const Zambia = 'ZM00260';
 	const Zimbabwe = DialCodeEnum::Zimbabwe;
 
+	public readonly string $name;
+	public readonly string $value;
+	protected DialCodeEnum $enum;
 
 	public static function cases(): array
 	{

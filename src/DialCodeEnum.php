@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * @author Jan Galek
  */
-enum DialCodeEnum: string
+enum DialCodeEnum: string implements Enum
 {
     case Afghanistan = 'AF0093';
     case Albania = 'AL00355';
@@ -265,9 +265,30 @@ enum DialCodeEnum: string
         return $result;
     }
 
-	public static function tryFrom(int|string $value): ?static
+	/**
+	 * @desc Replacing from method
+	 * @param int|string $value
+	 * @return static
+	 */
+	public static function create(int|string $value): static
 	{
+		static::validate($value);
+		return self::from($value);
+	}
 
-		return null;
+	/**
+	 * @desc Replacing tryFrom method
+	 * @param int|string $value
+	 * @return static|null
+	 */
+	public static function tryCreate(int|string $value): ?static
+	{
+		static::validate($value);
+		return self::tryFrom($value);
+	}
+
+	public static function validate(int|string $value): void
+	{
+		return;
 	}
 }
