@@ -3,7 +3,7 @@
   "description": "List of dialing codes",
   "type": "library",
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.2",
     "phpjg/enum": "*",
      "jgphp/countries": "*"
   },

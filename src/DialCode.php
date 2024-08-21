@@ -14,6 +14,7 @@ enum DialCode: string implements Enum
     case USVirginIslands = 'VI00340';
     case Andorra = 'AD00376';
     case Angola = 'AO00244';
+    //case Anguilla = 'AI00264';
     case Anguilla = 'AI00264';
     case Antarctica = 'AQ00672';
     case AntiguaAndBarbuda = 'AG00268';
@@ -77,7 +78,8 @@ enum DialCode: string implements Enum
     case Georgia = 'GE00995';
     case Guam = 'GU00671';
     case Guatemala = 'GT00502';
-    case Guernsey = 'GG0044';
+    //case Guernsey = 'GG0044';
+    case Guernsey = 'GG00441481';
     case Guinea = 'GN00224';
     case GuineaBissau = 'GW00245';
     case Guyana = 'GY00592';
@@ -95,7 +97,8 @@ enum DialCode: string implements Enum
     case Jamaica = 'JM00876';
     case Japan = 'JP0081';
     case Yemen = 'YE00967';
-    case Jersey = 'JE0044';
+    //case Jersey = 'JE0044';
+    case Jersey = 'JE00441534';
     case SouthAfrica = 'ZA0027';
     case SouthKorea = 'KR0082';
     case SouthSudan = 'SS00211';
@@ -137,7 +140,8 @@ enum DialCode: string implements Enum
     case Maldives = 'MV00960';
     case Mali = 'ML00223';
     case Malta = 'MT00356';
-    case IsleOfMan = 'IM0044';
+    //case IsleOfMan = 'IM0044';
+    case IsleOfMan = 'IM00441624';
     case Morocco = 'MA00212';
     case MarshallIslands = 'MH00692';
     case Mauritania = 'MR00222';
@@ -238,6 +242,62 @@ enum DialCode: string implements Enum
     case Zambia = 'ZM00260';
     case Zimbabwe = 'ZW00263';
 
+    protected const DUPLICATES = [
+        self::Anguilla->value => [
+            self::Anguilla,
+            self::Namibia,
+        ],
+        self::AntiguaAndBarbuda->value => [
+            self::AntiguaAndBarbuda,
+            self::Eswatini,
+        ],
+        self::Australia->value => [
+            self::Australia,
+            self::CocosIslands,
+        ],
+        self::Bahamas->value => [
+            self::Bahamas,
+            self::RepublicOfTheCongo,
+        ],
+        self::Barbados->value => [
+            self::Barbados,
+            self::BritishIndianOceanTerritory,
+        ],
+        self::Curacao->value => [
+            self::Curacao,
+            self::NetherlandsAntilles,
+        ],
+        self::UnitedKingdom->value => [
+            self::Guernsey,
+            self::Jersey,
+            self::IsleOfMan,
+            self::UnitedKingdom
+        ],
+        self::Canada->value => [
+            self::Canada,
+            self::UnitedStates,
+        ],
+        self::Russia->value => [
+            self::Kazakhstan,
+            self::Russia,
+        ],
+        self::Mayotte->value => [
+            self::Mayotte,
+            self::Reunion,
+        ],
+        self::NewZealand->value => [
+            self::NewZealand,
+            self::Pitcairn,
+        ],
+        self::NorthernMarianaIslands->value => [
+            self::NorthernMarianaIslands,
+            self::EastTimor,
+        ],
+    ];
+
+    public const PREFIX_PLUS = '+';
+    public const PREFIX_0 = '00';
+
 
     public function getValue(): string
     {
@@ -257,6 +317,23 @@ enum DialCode: string implements Enum
         return $result;
     }
 
+    public static function listDuplicates()
+    {
+        $list = self::cases();
+        $result = [];
+        foreach ($list as $name => $number) {
+            $result[$number->getValue()][$number->name] = $number->value;
+        }
+
+        foreach ($result as $key => $r) {
+            if (count($result[$key]) <= 1) {
+                unset($result[$key]);
+            }
+        }
+
+        var_dump($result);
+    }
+
     public static function listPlus(): array
     {
         $cases = self::cases();
@@ -265,30 +342,59 @@ enum DialCode: string implements Enum
         return $result;
     }
 
-	/**
-	 * @desc Replacing from method
-	 * @param int|string $value
-	 * @return static
-	 */
+    /**
+     * @inheritDoc
+     */
 	public static function create(int|string $value): static
 	{
-		static::validate($value);
+
+
+        DialCode::validate($value);
+
+        if (is_string($value)) {
+            if (DialCode::isFormatISO($value)) {
+
+            }
+        }
+
 		return self::from($value);
 	}
 
 	/**
-	 * @desc Replacing tryFrom method
-	 * @param int|string $value
-	 * @return static|null
+	 * @inheritDoc
 	 */
 	public static function tryCreate(int|string $value): ?static
 	{
-		static::validate($value);
-		return self::tryFrom($value);
+        try {
+            return DialCode::create($value);
+        } catch (ValueError $error) {
+            return null;
+        }
 	}
 
 	public static function validate(int|string $value): void
 	{
-		return;
+        if (is_string($value)) {
+            $value = trim($value);
+
+            if (!DialCode::isFormatISO($value) && !DialCode::isFormatNumeric($value) && !DialCode::isFormatPlus($value)) {
+                throw new ValueError("Invalid format for dial code: $value");
+            }
+        }
 	}
+
+    protected static function isFormatISO(string $value): bool
+    {
+        return preg_match('/^[A-Z]{2}\d{3,5}$/', $value);
+    }
+
+    protected static function isFormatNumeric(string $value): bool
+    {
+        return preg_match('/^\d{3,5}$/', $value);
+    }
+
+    protected static function isFormatPlus(string $value)
+    {
+        return preg_match('/^\+\d{3,5}$/', $value);
+    }
 }
